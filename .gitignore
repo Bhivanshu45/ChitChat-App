@@ -1,0 +1,15 @@
+# Dependency directories
+node_modules/
+
+# Environment files
+.env
+
+# Uploads directory
+uploads/
+
+# Logs
+npm-debug.log*
+
+# OS-specific files
+.DS_Store
+Thumbs.db

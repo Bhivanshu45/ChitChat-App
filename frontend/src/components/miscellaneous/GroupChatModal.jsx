@@ -1,6 +1,6 @@
 import React from 'react'
 
-const SearchBar = () => {
+const GroupChatModal = ({children}) => {
   return (
     <div>
       
@@ -8,4 +8,4 @@ const SearchBar = () => {
   )
 }
 
-export default SearchBar
+export default GroupChatModal

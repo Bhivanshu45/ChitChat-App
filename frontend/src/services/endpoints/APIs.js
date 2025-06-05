@@ -8,4 +8,5 @@ export const userAPI = {
 
 export const chatAPI = {
     GET_ALL_CHATS_API: BASE_URL + "/chat",
+    ACCESS_CHAT_API: BASE_URL + "/chat"
 }

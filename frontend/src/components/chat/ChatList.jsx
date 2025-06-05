@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Avatar,
   Box,
   Flex,
   Spinner,
   Text,
-  VStack,
+  Button,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,19 +13,22 @@ import { apiConnector } from "../../services/apiconnector";
 import { chatAPI } from "../../services/endpoints/APIs";
 import { setSelectedChat, setChats } from "../../slices/chatSlice";
 import { setLoading } from "../../slices/authSlice";
+import { AddIcon } from "@chakra-ui/icons";
+import GroupChatModal from "../miscellaneous/GroupChatModal";
 
 const { GET_ALL_CHATS_API } = chatAPI;
 
-const ChatList = () => {
+const ChatList = ({ fetchAgain }) => {
   const dispatch = useDispatch();
   const { chats, selectedChat, loading } = useSelector((state) => state.chat);
   const { user, token } = useSelector((state) => state.auth);
+
+  const [loggedUser, setLoggedUser] = useState();
 
   const bgSelected = useColorModeValue("blue.100", "blue.700");
   const bgUnselected = useColorModeValue("white", "gray.800");
   const bgHover = useColorModeValue("blue.50", "blue.600");
   const bgList = useColorModeValue("gray.50", "gray.700");
-
 
   const fetchChats = async () => {
     try {
@@ -36,15 +39,14 @@ const ChatList = () => {
       });
 
       console.log("Chats response:", response?.data);
-      console.log("User Populated : ",user)
+      console.log("User Populated : ", user);
 
-      if(response?.data?.success === false) {
+      if (response?.data?.success === false) {
         throw new Error(response.data.message || "Failed to fetch chats");
       }
 
       // Assume response.data is the desired payload
       dispatch(setChats(response?.data?.chats || []));
-
     } catch (error) {
       console.error(
         "There has been a problem with your fetch operation:",
@@ -57,23 +59,42 @@ const ChatList = () => {
 
   useEffect(() => {
     fetchChats();
-  }, [dispatch]);
+  }, [fetchAgain]);
 
   return (
-    <VStack
-      width="100%"
+    <Box
+      width={{ base: "100%", md: "30%" }}
       height="100%"
-      spacing={2}
-      align="stretch"
+      display={{ base: selectedChat ? "none" : "flex", md: "flex" }}
+      flexDirection="column"
       overflowY="auto"
+      gap={2}
       p={3}
       borderRadius="md"
       borderWidth="1px"
-      bg={bgList}
+      bg="white"
     >
-      <Text fontSize="xl" fontWeight="bold" mb={2}>
-        Chats
-      </Text>
+      <Box
+        display="flex"
+        width="100%"
+        fontFamily="Work sans"
+        justifyContent="space-between"
+        p={3}
+        alignItems="center"
+        fontSize="xl"
+        fontWeight="bold"
+      >
+        My Chats
+        <GroupChatModal>
+          <Button
+            display="flex"
+            fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+            rightIcon={<AddIcon />}
+          >
+            New Group Chat
+          </Button>
+        </GroupChatModal>
+      </Box>
 
       {loading ? (
         <Box
@@ -101,16 +122,18 @@ const ChatList = () => {
             boxShadow="sm"
             alignItems="center"
           >
-            <Box >
+            <Box>
               <Avatar
                 size="md"
                 src={
                   chat.isGroupChat
                     ? "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
-                    : chat?.users?.find((u) => u._id !== user._id)?.profilePicture}
+                    : chat?.users?.find((u) => u._id !== user._id)
+                        ?.profilePicture
+                }
               />
             </Box>
-            <Box >
+            <Box>
               <Text fontSize="md" fontWeight="bold">
                 {chat.isGroupChat
                   ? chat.chatName
@@ -127,7 +150,7 @@ const ChatList = () => {
           No chats available. Start a new conversation!
         </Text>
       )}
-    </VStack>
+    </Box>
   );
 };
 

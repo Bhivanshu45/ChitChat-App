@@ -1,30 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
 import { Flex, Box } from "@chakra-ui/react";
 import ChatList from "../components/chat/ChatList";
 import ChatWindow from "../components/chat/ChatWindow";
-import SearchBar from "../components/chat/SearchBar";
+import SideDrawer from "../components/miscellaneous/SideDrawer";
+import { useSelector } from "react-redux";
 
 const ChatPage = () => {
+  const [fetchAgain,setFetchAgain] = useState(false)
+  const {user} = useSelector((state) => state.auth)
+  const {selectedChat} = useSelector((state) => state.chat)
   return (
-    <Flex height="100vh" width="100vw">
-      {/* Left Sidebar */}
-      <Flex
-        width="30%"
-        height="100%"
-        direction="column"
-        borderRight="1px solid"
-        borderColor="gray.300"
-        p="10px"
-      >
-        <SearchBar />
-        <ChatList />
-      </Flex>
+    <div style={{ width: "100%" }}>
+      {user && <SideDrawer />}
 
-      {/* Right Chat Window */}
-      <Flex width="70%" height="100%" direction="column" p="10px" bg="gray.100">
-        <ChatWindow />
-      </Flex>
-    </Flex>
+      <Box
+        display='flex'
+        justifyContent="space-between"
+        width="100%"
+        height="91.5vh"
+        padding="10px"
+      >
+        {user && <ChatList fetchAgain={fetchAgain} />}
+        {user && (
+          <ChatWindow fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+        )}
+      </Box>
+    </div>
   );
 };
 

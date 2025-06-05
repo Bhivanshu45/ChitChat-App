@@ -1,33 +1,25 @@
-import { Button } from '@chakra-ui/react'
+import {  Box } from '@chakra-ui/react'
 import React from 'react'
-import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom';
-import { logout } from '../../slices/authSlice';
+import { useSelector } from 'react-redux';
+import SingleChat from './SingleChat';
 
-const ChatWindow = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const logoutHandler = () => {
-    dispatch(logout());
-
-    // Clear localStorage/sessionStorage if used
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    // Redirect to login or homepage
-    navigate("/");
-
-  }
+const ChatWindow = ({fetchAgain,setFetchAgain}) => {
+  const {selectedChat} = useSelector((state) => state.chat)
 
   return (
-    <div>
-      <Button
-      onClick={logoutHandler}>
-        LogOUt
-      </Button>
-    </div>
-  )
+    <Box
+      display={{ base: selectedChat ? "flex" : "none", md: "flex" }}
+      alignItems="center"
+      flexDirection="column"
+      p={3}
+      bg="white"
+      w={{ base: "100%", md: "69.5%" }}
+      borderRadius="lg"
+      borderWidth="1px"
+    >
+      <SingleChat fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+    </Box>
+  );
 }
 
 export default ChatWindow

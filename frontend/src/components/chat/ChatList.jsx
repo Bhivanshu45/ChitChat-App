@@ -121,6 +121,7 @@ const ChatList = ({ fetchAgain }) => {
             borderWidth="1px"
             boxShadow="sm"
             alignItems="center"
+
           >
             <Box>
               <Avatar

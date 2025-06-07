@@ -156,27 +156,11 @@ exports.loginUser = async(req,res) => {
     }
 }
 
-// logout user
-exports.logoutUser = async(req,res) => {
-    try{
-        
-        
-
-    }catch(err){
-        console.log(err);
-        return res.status(500).json({
-          success: false,
-          message: "user Logout failed",
-          error: err.message,
-        });
-    }
-}
-
 exports.searchUser = async(req,res) => {
     try{
       const search = req.query.search;
 
-      console.log("Search query:", search);
+      // console.log("Search query:", search);
       
       if (!search) {
         return res.status(400).json({

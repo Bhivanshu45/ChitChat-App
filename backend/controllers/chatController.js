@@ -36,10 +36,19 @@ exports.accessChat = async (req, res) => {
                 chat,
             });
         }
+
+        const person = await User.findById(userId);
+
+        if(!person){
+            return res.status(400).json({
+              success: false,
+              message: "User not Exist",
+            });
+        }
         
 
         chat = await Chat.create({
-            chatName: "Sender",
+            chatName: person.name,
             isGroupChat: false,
             users: [req.user.id, userId],
         });
@@ -109,20 +118,19 @@ exports.createGroupChat = async (req, res) => {
         }
 
         // convert users to array of objectIds
-        let usersArray = JSON.parse(users);
-        if (usersArray.length < 2) {
+        if (users.length < 2) {
             return res.status(400).json({
                 success: false,
                 message: "A group chat must have at least 2 users",
             });
         }
 
-        usersArray.push(req.user.id);
+        users.push(req.user.id);
 
         const groupChat = await Chat.create({
             chatName: chatName,
             isGroupChat: true,
-            users: usersArray,
+            users: users,
             groupAdmin: req.user.id,
         });
 
@@ -247,6 +255,9 @@ exports.removeFromGroup = async (req, res) => {
     try{
         const { chatId, userId } = req.body;
 
+        // console.log("Chat ID : ",chatId)
+        // console.log("userId : ",userId)
+
         if (!chatId || !userId) {
             return res.status(400).json({
                 success: false,
@@ -279,6 +290,8 @@ exports.removeFromGroup = async (req, res) => {
             .populate("users", "-password")
             .populate("groupAdmin", "-password");
 
+        // console.log("fullUpdatedChat : ",fullUpdatedChat)
+
         return res.status(200).json({
             success: true,
             groupChat: fullUpdatedChat,
@@ -291,5 +304,73 @@ exports.removeFromGroup = async (req, res) => {
             message: "Failed to remove user from group",
             error: err.message,
         });
+    }
+}
+
+exports.leaveGroup = async(req,res) => {
+    try {
+      const { chatId, userId } = req.body;
+
+      // console.log("Chat ID : ",chatId)
+      // console.log("userId : ",userId)
+
+      if (!chatId || !userId) {
+        return res.status(400).json({
+          success: false,
+          message: "Please provide all required fields",
+        });
+      }
+
+      const chat = await Chat.findById(chatId);
+
+      if (!chat) {
+        return res.status(404).json({
+          success: false,
+          message: "Chat not found",
+        });
+      }
+
+      // Check if the user is in the group
+      if (!chat.users.includes(userId)) {
+        return res.status(400).json({
+          success: false,
+          message: "User is not in the group",
+        });
+      }
+
+      const isAdminLeaving = chat.groupAdmin.toString() === userId;
+
+      // Remove user from group
+      chat.users = chat.users.filter((id) => id.toString() !== userId);
+
+      // If the user is the admin and there are still users left, promote the first joined user
+      if (isAdminLeaving && chat.users.length > 0) {
+        chat.groupAdmin = chat.users[0]; // Promote the first remaining user
+      }
+
+      // Optional: If no users are left, unset the groupAdmin
+      if (chat.users.length === 0) {
+        chat.groupAdmin = undefined;
+      }
+      
+      const updatedChat = await chat.save();
+
+      const fullUpdatedChat = await Chat.findById(updatedChat._id)
+        .populate("users", "-password")
+        .populate("groupAdmin", "-password");
+
+      // console.log("fullUpdatedChat : ",fullUpdatedChat)
+
+      return res.status(200).json({
+        success: true,
+        groupChat: fullUpdatedChat,
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to leave from group",
+        error: err.message,
+      });
     }
 }

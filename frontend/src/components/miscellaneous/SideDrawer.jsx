@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Avatar,
   Box,
@@ -35,7 +35,7 @@ import { setChats, setSelectedChat } from '../../slices/chatSlice';
 const {SEARCH_USER_API} = userAPI;
 const {ACCESS_CHAT_API} = chatAPI;
 
-const SideDrawer = () => {
+const SideDrawer = ({fetchAgain, setFetchAgain}) => {
     const [search,setSearch] = useState('');
     const [searchResult,setSearchResult] = useState([]);
     const [loadingChat,setLoadingChat] = useState(false)
@@ -61,9 +61,8 @@ const SideDrawer = () => {
       navigate("/");
     };
 
-    const searchHandler = async() => {
+    const handleSearch = async(search) => {
       if(!search){
-        toast.error("Please Enter something")
         return;
       }
 
@@ -110,6 +109,7 @@ const SideDrawer = () => {
         
         dispatch(setSelectedChat(fetchedChat));
         setLoadingChat(false)
+        setFetchAgain(!fetchAgain)
         onClose()
 
       } catch (error) {
@@ -117,6 +117,14 @@ const SideDrawer = () => {
         return;
       }
     }
+
+    useEffect(() => {
+      const delayDebounce = setTimeout(() => {
+        handleSearch(search);
+      }, 400);
+
+      return () => clearTimeout(delayDebounce);
+    },[search])
 
   return (
     <>
@@ -183,10 +191,6 @@ const SideDrawer = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               />
-
-              <Button 
-              onClick={searchHandler}
-              >Go</Button>
               
             </Box>
             {loading ? (

@@ -9,12 +9,15 @@ const ChatPage = () => {
   const [fetchAgain,setFetchAgain] = useState(false)
   const {user} = useSelector((state) => state.auth)
   const {selectedChat} = useSelector((state) => state.chat)
+  
   return (
     <div style={{ width: "100%" }}>
-      {user && <SideDrawer />}
+      {user && (
+        <SideDrawer fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+      )}
 
       <Box
-        display='flex'
+        display="flex"
         justifyContent="space-between"
         width="100%"
         height="91.5vh"

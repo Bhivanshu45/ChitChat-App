@@ -13,11 +13,15 @@ import toast from "react-hot-toast";
 import { apiConnector } from "../../services/apiconnector";
 import { userAPI } from "../../services/endpoints/APIs";
 import { useNavigate } from "react-router-dom";
-import { setToken } from "../../slices/authSlice";
+import { setToken, setUser } from "../../slices/authSlice";
+import { useDispatch } from "react-redux";
 
 const { SIGNUP_API } = userAPI;
 
 const Signup = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [show, setShow] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -32,7 +36,6 @@ const Signup = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
 
-  const navigate = useNavigate();
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -67,6 +70,7 @@ const Signup = () => {
       localStorage.setItem("user", JSON.stringify(response.data.user));
       localStorage.setItem("token", JSON.stringify(response.data.token));
       navigate("/chats");
+      
     } catch (err) {
       console.error("Error during signup:", err);
       toast.error("Signup failed. Please try again.", { id: toastId });

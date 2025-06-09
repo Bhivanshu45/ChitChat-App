@@ -3,7 +3,6 @@ const router = express.Router();
 
 const {accessChat, fetchChats,createGroupChat, renameGroup, addToGroup ,removeFromGroup, leaveGroup} = require('../controllers/chatController.js');
 const { authUser } = require('../middlewares/authMiddleware.js');
-const { create } = require('../models/userSchema.js');
 
 router.get("/", authUser,fetchChats);
 router.post('/', authUser, accessChat);

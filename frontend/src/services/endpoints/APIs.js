@@ -15,3 +15,8 @@ export const chatAPI = {
     RENAME_GROUP_API: BASE_URL + "/chat/rename",
     LEAVE_GROUP_API : BASE_URL + "/chat/leave"
 }
+
+export const messageAPI = {
+    SEND_MESSAGE_API : BASE_URL + "/message",
+    GET_CHAT_MESSAGES: BASE_URL + "/message"
+}

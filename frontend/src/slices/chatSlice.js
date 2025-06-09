@@ -3,9 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     selectedChat: null,
     chats: [],
-    messages: [],
-    notifications: [],
-    socket: null
+    notifications: []
 };
 
 const chatSlice = createSlice({
@@ -18,23 +16,11 @@ const chatSlice = createSlice({
         setChats(state, action) {
             state.chats = action.payload;
         },
-        setMessages(state, action) {
-            state.messages = action.payload;
-        },
         setNotifications(state, action) {
             state.notifications = action.payload;
-        },
-        setSocket(state, action) {
-            state.socket = action.payload;
-        },
-        addMessages(state, action) {
-            state.messages.push(action.payload);
-        },
-        addNotifications(state, action) {
-            state.notifications.push(action.payload);
         },
     },
 });
 
-export const {setMessages,setChats,setNotifications,setSelectedChat,setSocket, addMessages,addNotifications} = chatSlice.actions;
+export const {setChats,setNotifications,setSelectedChat} = chatSlice.actions;
 export default chatSlice.reducer;

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {
   Avatar,
+  Badge,
   Box,
   Button,
   Drawer,
@@ -30,7 +31,8 @@ import { userAPI } from '../../services/endpoints/APIs';
 import { chatAPI } from '../../services/endpoints/APIs';
 import ChatLoading from './ChatLoading';
 import UserListItem from './UserListItem';
-import { setChats, setSelectedChat } from '../../slices/chatSlice';
+import { setChats, setNotifications, setSelectedChat } from '../../slices/chatSlice';
+import { getSender } from '../../utils/getSenderDetail';
 
 const {SEARCH_USER_API} = userAPI;
 const {ACCESS_CHAT_API} = chatAPI;
@@ -42,7 +44,7 @@ const SideDrawer = ({fetchAgain, setFetchAgain}) => {
     const [loading,setLoading] = useState(false);
 
     const {user,token} = useSelector((state) => state.auth);
-    const {chats,selectedChat} = useSelector((state) => state.chat)
+    const {chats,selectedChat,notifications} = useSelector((state) => state.chat)
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -149,11 +151,52 @@ const SideDrawer = ({fetchAgain, setFetchAgain}) => {
         <Text fontSize="1.6rem" fontWeight="semibold" fontFamily="work sans">
           Chit - Chat
         </Text>
-        <div>
+        <Box display="flex" gap={4}>
           <Menu>
-            <MenuButton padding={1}>
-              <i className="fa-solid fa-bell"></i>
+            <MenuButton padding={1} position="relative">
+              <i
+                className="fa-solid fa-bell"
+                style={{ fontSize: "1.5rem" }}
+              ></i>
+              {notifications.length > 0 && (
+                <Badge
+                  position="absolute"
+                  top="0"
+                  right="0"
+                  transform="translate(25%, -25%)"
+                  borderRadius="full"
+                  bg="red.500"
+                  color="white"
+                  fontSize="0.7em"
+                  px={2}
+                  py={1}
+                >
+                  {notifications.length}
+                </Badge>
+              )}
             </MenuButton>
+
+            <MenuList p={2}>
+              {!notifications.length
+                ? "no New Messages"
+                : notifications.map((notif) => (
+                    <MenuItem
+                      key={notif._id}
+                      onClick={() => {
+                        dispatch(setSelectedChat(notif.chat));
+                        dispatch(
+                          setNotifications(
+                            notifications.filter((n) => n._id !== notif._id)
+                          )
+                        );
+                      }}
+                    >
+                      {notif.chat.isGroupChat
+                        ? `New Message from ${notif.sender.name} in ${notif.chat.chatName}`
+                        : `New Message from ${notif.sender.name}`}
+                    </MenuItem>
+                  ))}
+            </MenuList>
           </Menu>
           <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
@@ -171,44 +214,36 @@ const SideDrawer = ({fetchAgain, setFetchAgain}) => {
               <MenuItem onClick={logoutHandler}>Logout</MenuItem>
             </MenuList>
           </Menu>
-        </div>
+        </Box>
       </Box>
-      <Drawer
-       placement='left'
-       onClose={onClose}
-       isOpen={isOpen}
-      >
-        <DrawerOverlay/>
+      <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
+        <DrawerOverlay />
         <DrawerContent>
-          <DrawerHeader>
-            Search Users
-          </DrawerHeader>
+          <DrawerHeader>Search Users</DrawerHeader>
           <DrawerBody>
-            <Box display='flex' pb={2}>
+            <Box display="flex" pb={2}>
               <Input
-              placeholder='Search by name or email'
-              mr={2}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by name or email"
+                mr={2}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
-              
             </Box>
             {loading ? (
-              <ChatLoading/>
+              <ChatLoading />
             ) : (
               searchResult?.map((user) => (
                 <UserListItem
-                key={user._id}
-                user={user}
-                handleFunction={() => accessChat(user._id)}
+                  key={user._id}
+                  user={user}
+                  handleFunction={() => accessChat(user._id)}
                 />
               ))
-            ) }
+            )}
 
-            {loadingChat && <Spinner ml='auto' display='flex' />}
+            {loadingChat && <Spinner ml="auto" display="flex" />}
           </DrawerBody>
         </DrawerContent>
-        
       </Drawer>
     </>
   );

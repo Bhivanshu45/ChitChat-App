@@ -12,7 +12,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { apiConnector } from "../../services/apiconnector";
 import { chatAPI } from "../../services/endpoints/APIs";
 import { setSelectedChat, setChats } from "../../slices/chatSlice";
-import { setLoading } from "../../slices/authSlice";
 import { AddIcon } from "@chakra-ui/icons";
 import GroupChatModal from "../miscellaneous/GroupChatModal";
 
@@ -20,19 +19,21 @@ const { GET_ALL_CHATS_API } = chatAPI;
 
 const ChatList = ({ fetchAgain }) => {
   const dispatch = useDispatch();
-  const { chats, selectedChat, loading } = useSelector((state) => state.chat);
+  const { chats, selectedChat } = useSelector((state) => state.chat);
   const { user, token } = useSelector((state) => state.auth);
 
   const [loggedUser, setLoggedUser] = useState();
+  const [loading ,setLoading] = useState();
 
   const bgSelected = useColorModeValue("blue.100", "blue.700");
   const bgUnselected = useColorModeValue("white", "gray.800");
   const bgHover = useColorModeValue("blue.50", "blue.600");
   const bgList = useColorModeValue("gray.50", "gray.700");
 
+
   const fetchChats = async () => {
     try {
-      dispatch(setLoading(true));
+      setLoading(true);
 
       const response = await apiConnector("GET", GET_ALL_CHATS_API, null, {
         Authorization: `Bearer ${token}`,
@@ -53,7 +54,7 @@ const ChatList = ({ fetchAgain }) => {
         error
       );
     } finally {
-      dispatch(setLoading(false));
+      setLoading(false);
     }
   };
 

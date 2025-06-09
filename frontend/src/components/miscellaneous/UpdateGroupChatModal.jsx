@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 const {REMOVE_USER_FROM_GROUP, RENAME_GROUP_API,ADD_USER_TO_GROUP,LEAVE_GROUP_API} = chatAPI
 const {SEARCH_USER_API} = userAPI
 
-const UpdateGroupChatModal = ({fetchAgain,setFetchAgain}) => {
+const UpdateGroupChatModal = ({fetchAgain,setFetchAgain,fetchMessages}) => {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -87,6 +87,7 @@ const UpdateGroupChatModal = ({fetchAgain,setFetchAgain}) => {
 
             dispatch(setSelectedChat(response.data.groupChat));
             setFetchAgain(!fetchAgain)
+            fetchMessages()
             setLoading(false)
         }catch(err){
             console.error(err.message)
